@@ -119,7 +119,7 @@
 * Password : Admin
 ---
 
-## Notes
+## 📌 Notes
 
 * Admin routes are protected by middleware
 * Dynamic forms stored in database
