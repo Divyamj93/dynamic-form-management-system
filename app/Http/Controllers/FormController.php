@@ -39,40 +39,55 @@ class FormController extends Controller
     $form = Form::create([
     'title' => $request->title,
     'status' => 1
-]);
-
-// ✅ STEP 1: SAVE DEFAULT FIELDS
-$defaultFields = [
-    ['label' => 'name', 'type' => 'text'],
-    ['label' => 'email', 'type' => 'email'],
-    ['label' => 'phone', 'type' => 'number'],
-];
-
-foreach ($defaultFields as $df) {
-    FormField::updateOrCreate([
-        'form_id' => $form->id,
-        'label' => $df['label'],
-        'type' => $df['type'],
-        'required' => 0,
     ]);
-}
 
-// ✅ STEP 2: SAVE CUSTOM FIELDS
-foreach ($request->fields as $field) {
+    // ✅ STEP 1: SAVE DEFAULT FIELDS
+    $defaultFields = [
+        ['label' => 'name', 'type' => 'text'],
+        ['label' => 'email', 'type' => 'email'],
+        ['label' => 'phone', 'type' => 'number'],
+    ];
 
-    if (empty($field['label'])) continue;
+    foreach ($defaultFields as $df) {
+        FormField::updateOrCreate([
+            'form_id' => $form->id,
+            'label' => $df['label'],
+            'type' => $df['type'],
+            'required' => 0,
+        ]);
+    }
+    $cleanFields = [];
 
-    FormField::updateOrCreate([
-        'form_id' => $form->id,
-        'label' => $field['label'],
-        'type' => $field['type'],
-        'required' => isset($field['required']) ? 1 : 0,
-        'options' => isset($field['options']) ? json_encode(explode(',', $field['options'])) : null,
-        'validation_rules' => $field['validation'] ?? null,
-    ]);
-}
+    // ✅ STEP 2: SAVE CUSTOM FIELDS
+    foreach ($request->fields as $field) {
+        $label = strtolower(trim($field['label'] ?? ''));
 
-return redirect('/admin/forms')->with('success', 'Form Saved Successfully');
+    if (!$label) continue;
+
+    // Skip duplicate labels
+    if (isset($cleanFields[$label])) continue;
+
+    $cleanFields[$label] = $field;
+
+    foreach ($cleanFields as $field) {
+
+    $label = strtolower(trim($field['label']));
+
+    // Skip default duplicates
+    if (in_array($label, ['name', 'email', 'phone'])) continue;
+
+        FormField::updateOrCreate([
+            'form_id' => $form->id,
+            'label' => $field['label'],
+            'type' => $field['type'],
+            'required' => isset($field['required']) ? 1 : 0,
+            'options' => isset($field['options']) ? json_encode(explode(',', $field['options'])) : null,
+            'validation_rules' => $field['validation'] ?? null,
+        ]);
+    }
+    }
+
+    return redirect('/admin/forms')->with('success', 'Form Saved Successfully');
     }
 
     public function showForm($id)

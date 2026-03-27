@@ -38,7 +38,8 @@
 </div>
 
 <script>
-let fieldIndex = 0;
+let fieldIndex = 1;
+// let fieldIndex = document.querySelectorAll('#fields div').length;
 
 function addField() {
     let html = `
