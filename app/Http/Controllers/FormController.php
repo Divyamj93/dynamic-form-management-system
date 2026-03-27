@@ -49,11 +49,11 @@ $defaultFields = [
 ];
 
 foreach ($defaultFields as $df) {
-    FormField::create([
+    FormField::updateOrCreate([
         'form_id' => $form->id,
         'label' => $df['label'],
         'type' => $df['type'],
-        'required' => 1,
+        'required' => 0,
     ]);
 }
 
@@ -62,7 +62,7 @@ foreach ($request->fields as $field) {
 
     if (empty($field['label'])) continue;
 
-    FormField::create([
+    FormField::updateOrCreate([
         'form_id' => $form->id,
         'label' => $field['label'],
         'type' => $field['type'],
