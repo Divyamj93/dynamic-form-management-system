@@ -1,3 +1,11 @@
+@if ($errors->any())
+    <div style="color:red; background:#ffe6e6; padding:10px; margin-bottom:10px;">
+        <strong>Errors:</strong>
+        @foreach ($errors->all() as $error)
+            <p>{{ $error }}</p>
+        @endforeach
+    </div>
+@endif
 <form method="POST" action="{{ route('forms.store') }}">
     @csrf
     <h3>Title</h3>
@@ -17,8 +25,18 @@
             <option value="dropdown">Dropdown</option>
             <option value="checkbox">Checkbox</option>
         </select>
+        <label>
+            <input type="checkbox" name="fields[0][required]" value="1">
+            Required
+        </label>
 
-        <input type="text" name="fields[0][validation]" placeholder="Validation (ex: required|email)">
+        <!-- ✅ VALIDATION SELECT -->
+        <select name="fields[0][validation]">
+            <option value="">No Validation</option>
+            <option value="email">Email</option>
+            <option value="numeric">Numeric</option>
+        </select>
+        <!-- <input type="text" name="fields[0][validation]" placeholder="Validation (ex: required|email)"> -->
         <input type="text" name="fields[0][options]" placeholder="Options (comma separated)">
     </div>
 </div>
@@ -56,7 +74,18 @@ function addField() {
                 <option value="checkbox">Checkbox</option>
             </select>
 
-            <input type="text" name="fields[${fieldIndex}][validation]" placeholder="Validation">
+            <label>
+                <input type="checkbox" name="fields[${fieldIndex}][required]" value="1">
+                Required
+            </label>
+
+            <select name="fields[${fieldIndex}][validation]">
+                <option value="">No Validation</option>
+                <option value="email">Email</option>
+                <option value="numeric">Numeric</option>
+            </select>
+
+             <!--<input type="text" name="fields[${fieldIndex}][validation]" placeholder="Validation">-->
 
             <input type="text" name="fields[${fieldIndex}][options]" placeholder="Options (comma separated)">
 

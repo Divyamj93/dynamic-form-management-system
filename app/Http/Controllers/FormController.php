@@ -16,7 +16,7 @@ class FormController extends Controller
      */
     public function index()
     {
-        $forms = \App\Models\Form::all();
+        $forms = Form::all();
 
         return view('admin.forms.index', compact('forms'));
     }
@@ -33,63 +33,79 @@ class FormController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+   public function store(Request $request)
     {
-        // 1. Save Form
-    $form = Form::create([
-    'title' => $request->title,
-    'status' => 1
-    ]);
-
-    // ✅ STEP 1: SAVE DEFAULT FIELDS
-    $defaultFields = [
-        ['label' => 'name', 'type' => 'text'],
-        ['label' => 'email', 'type' => 'email'],
-        ['label' => 'phone', 'type' => 'number'],
-    ];
-
-    foreach ($defaultFields as $df) {
-        FormField::updateOrCreate([
-            'form_id' => $form->id,
-            'label' => $df['label'],
-            'type' => $df['type'],
-            'required' => 0,
+        // ✅ STEP 1: VALIDATION
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'fields' => 'required|array|min:1',
+            'fields.*.label' => 'required|string|max:255',
+            'fields.*.type' => 'required|string',
         ]);
+
+        foreach ($request->fields as $index => $field) {
+
+        if (in_array($field['type'], ['dropdown','checkbox']) && empty($field['options'])) {
+
+            return back()->withErrors([
+                "fields.$index.options" => "Options required for {$field['label']}"
+            ])->withInput();
+        }
     }
-    $cleanFields = [];
 
-    // ✅ STEP 2: SAVE CUSTOM FIELDS
-    foreach ($request->fields as $field) {
-        $label = strtolower(trim($field['label'] ?? ''));
-
-    if (!$label) continue;
-
-    // Skip duplicate labels
-    if (isset($cleanFields[$label])) continue;
-
-    $cleanFields[$label] = $field;
-
-    foreach ($cleanFields as $field) {
-
-    $label = strtolower(trim($field['label']));
-
-    // Skip default duplicates
-    if (in_array($label, ['name', 'email', 'phone'])) continue;
-
-        FormField::updateOrCreate([
-            'form_id' => $form->id,
-            'label' => $field['label'],
-            'type' => $field['type'],
-            'required' => isset($field['required']) ? 1 : 0,
-            'options' => isset($field['options']) ? json_encode(explode(',', $field['options'])) : null,
-            'validation_rules' => $field['validation'] ?? null,
+        // ✅ STEP 2: CREATE FORM
+        $form = Form::create([
+            'title' => $request->title,
+            'status' => 1
         ]);
-    }
-    }
 
-    return redirect('/admin/forms')->with('success', 'Form Saved Successfully');
-    }
+        // ✅ STEP 3: DEFAULT FIELDS
+        $defaultFields = [
+            ['label' => 'name', 'type' => 'text'],
+            ['label' => 'email', 'type' => 'email'],
+            ['label' => 'phone', 'type' => 'number'],
+        ];
 
+        foreach ($defaultFields as $df) {
+            FormField::create([
+                'form_id' => $form->id,
+                'label' => $df['label'],
+                'type' => $df['type'],
+                'required' => 1,
+            ]);
+        }
+
+        // ✅ STEP 4: CLEAN DUPLICATES
+        $cleanFields = [];
+
+        foreach ($request->fields as $field) {
+
+            $label = strtolower(trim($field['label']));
+
+            // Skip default fields duplicate
+            if (in_array($label, ['name','email','phone'])) continue;
+
+            // Skip duplicate labels
+            if (isset($cleanFields[$label])) continue;
+
+            $cleanFields[$label] = $field;
+        }
+
+        // ✅ STEP 5: SAVE CLEAN FIELDS
+        foreach ($cleanFields as $field) {
+
+            FormField::create([
+                'form_id' => $form->id,
+                'label' => $field['label'],
+                'type' => $field['type'],
+                'required' => isset($field['required']) ? 1 : 0,
+                'options' => isset($field['options']) ? json_encode(explode(',', $field['options'])) : null,
+                'validation_rules' => $field['validation'] ?? null,
+            ]);
+        }
+
+        return redirect('/admin/forms')->with('success', 'Form Saved Successfully');
+    }
     public function showForm($id)
     {
         $form = \App\Models\Form::with('fields')->findOrFail($id);
@@ -99,15 +115,24 @@ class FormController extends Controller
 
     public function submitForm(Request $request, $id)
     {
-        $form = \App\Models\Form::with('fields')->findOrFail($id);
+        $form = Form::with('fields')->findOrFail($id);
 
         // ✅ Dynamic validation
         $rules = [];
 
         foreach ($form->fields as $field) {
-            if ($field->validation_rules) {
-                $rules[$field->label] = $field->validation_rules;
+
+            $rule = '';
+
+            if ($field->required) {
+                $rule .= 'required|';
             }
+
+            if ($field->validation_rules) {
+                $rule .= $field->validation_rules;
+            }
+
+            $rules[$field->label] = trim($rule, '|');
         }
 
         $request->validate($rules);
