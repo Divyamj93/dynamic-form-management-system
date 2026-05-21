@@ -1,30 +1,48 @@
-<h2>All Forms</h2>
+<link rel="stylesheet" href="{{ asset('css/style.css') }}">
 
-<a href="/admin/forms/create">Create New Form</a>
+<div class="container">
 
-<table border="1">
-    <tr>
-        <th>ID</th>
-        <th>Title</th>
-        <th>View</th>
-    </tr>
+    <!-- Header -->
+    <div class="card">
+        <h2>All Forms</h2>
 
-    @foreach($forms as $form)
-    <tr>
-        <td>{{ $form->id }}</td>
-        <td>{{ $form->title }}</td>
-        <td>
-            <a href="/form/{{ $form->id }}" target="_blank">Open Form</a>
-        </td>
-    </tr>
-    @endforeach
+        <a href="/admin/forms/create" class="btn">+ Create New Form</a>
+    </div>
 
-</table>
+    <!-- Table -->
+    <div class="card">
 
-<br><br>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Title</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
 
-    <div style="margin-bottom:15px;">
-    <a href="/admin/dashboard" style="background:#333;color:#fff;padding:6px 10px;text-decoration:none;">
-        ← Back to Dashboard
-    </a>
+            <tbody>
+                @foreach($forms as $form)
+                <tr>
+                    <td>{{ $form->id }}</td>
+                    <td>{{ $form->title }}</td>
+                    <td>
+                        <a href="/form/{{ $form->id }}" target="_blank" class="btn-secondary">
+                            Open Form
+                        </a>
+                    </td>
+                </tr>
+                @endforeach
+            </tbody>
+        </table>
+
+    </div>
+
+    <!-- Back Button -->
+    <div style="margin-top:20px;">
+        <a href="/admin/dashboard" class="btn-secondary">
+            ← Back to Dashboard
+        </a>
+    </div>
+
 </div>

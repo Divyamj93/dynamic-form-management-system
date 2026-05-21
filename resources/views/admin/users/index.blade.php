@@ -1,31 +1,49 @@
-<x-app-layout>
-    <x-slot name="header">
+<link rel="stylesheet" href="{{ asset('css/style.css') }}">
+
+<div class="container">
+
+    <!-- Header -->
+    <div class="card">
         <h2>Users</h2>
-    </x-slot>
-
-    <div class="p-6">
-        <table border="1">
-            <tr>
-                <th>ID</th>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Role</th>
-            </tr>
-
-            @foreach($users as $user)
-            <tr>
-                <td>{{ $user->id }}</td>
-                <td>{{ $user->name }}</td>
-                <td>{{ $user->email }}</td>
-                <td>{{ $user->role }}</td>
-            </tr>
-            @endforeach
-        </table>
     </div>
-    
-    <div style="margin-bottom:15px;">
-    <a href="/admin/dashboard" style="background:#333;color:#fff;padding:6px 10px;text-decoration:none;">
-        ← Back to Dashboard
-    </a>
+
+    <!-- Table -->
+    <div class="card">
+
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @foreach($users as $user)
+                <tr>
+                    <td>{{ $user->id }}</td>
+                    <td>{{ $user->name }}</td>
+                    <td>{{ $user->email }}</td>
+                    <td>
+                        <span class="{{ $user->role == 'admin' ? 'badge-admin' : 'badge-user' }}">
+                            {{ ucfirst($user->role) }}
+                        </span>
+                    </td>
+                </tr>
+                @endforeach
+            </tbody>
+
+        </table>
+
+    </div>
+
+    <!-- Back Button -->
+    <div style="margin-top:20px;">
+        <a href="/admin/dashboard" class="btn-secondary">
+            ← Back to Dashboard
+        </a>
+    </div>
+
 </div>
-</x-app-layout>

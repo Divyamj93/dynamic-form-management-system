@@ -1,54 +1,81 @@
-<h2>{{ $form->title }}</h2>
+<link rel="stylesheet" href="{{ asset('css/style.css') }}">
 
-@if ($errors->any())
-    <div style="color:red;">
-        @foreach ($errors->all() as $error)
-            <p>{{ $error }}</p>
-        @endforeach
-    </div>
-@endif
+<div class="container">
 
-<form method="POST" action="/form/{{ $form->id }}">
-    @csrf
+    <div class="card" style="max-width:600px; margin:auto;">
 
-    @foreach($form->fields as $field)
+        <h2 style="text-align:center;">{{ $form->title }}</h2>
 
-        <label>{{ $field->label }}</label>
-
-        {{-- TEXT / EMAIL / NUMBER --}}
-        @if(in_array($field->type, ['text','email','number','date']))
-            <input type="{{ $field->type }}" name="{{ $field->label }}">
-        @endif
-
-        {{-- DROPDOWN --}}
-        @if($field->type == 'dropdown')
-            <select name="{{ $field->label }}">
-                @foreach(json_decode($field->options ?? '[]') as $option)
-                    <option value="{{ $option }}">{{ $option }}</option>
+        {{-- Errors --}}
+        @if ($errors->any())
+            <div class="alert">
+                @foreach ($errors->all() as $error)
+                    <p>{{ $error }}</p>
                 @endforeach
-            </select>
+            </div>
         @endif
 
-        {{-- CHECKBOX --}}
-        @if($field->type == 'checkbox')
-            @foreach(json_decode($field->options ?? '[]') as $option)
-                <label>
-                    <input type="checkbox" name="{{ $field->label }}[]" value="{{ $option }}">
-                    {{ $option }}
-                </label>
+        <form method="POST" action="/form/{{ $form->id }}">
+            @csrf
+
+            @foreach($form->fields as $field)
+
+                <div style="margin-bottom:15px;">
+
+                    <label style="display:block; margin-bottom:5px;">
+                        {{ ucfirst($field->label) }}
+                    </label>
+
+                    {{-- TEXT / EMAIL / NUMBER / DATE --}}
+                    @if(in_array($field->type, ['text','email','number','date']))
+                        <input type="{{ $field->type }}"
+                               name="{{ $field->label }}"
+                               value="{{ old($field->label) }}"
+                               style="width:100%;">
+                    @endif
+
+                    {{-- DROPDOWN --}}
+                    @if($field->type == 'dropdown')
+                        <select name="{{ $field->label }}" style="width:100%;">
+                            @foreach(json_decode($field->options ?? '[]') as $option)
+                                <option value="{{ $option }}"
+                                    {{ old($field->label) == $option ? 'selected' : '' }}>
+                                    {{ $option }}
+                                </option>
+                            @endforeach
+                        </select>
+                    @endif
+
+                    {{-- CHECKBOX --}}
+                    @if($field->type == 'checkbox')
+                        @foreach(json_decode($field->options ?? '[]') as $option)
+                            <label style="margin-right:10px;">
+                                <input type="checkbox"
+                                       name="{{ $field->label }}[]"
+                                       value="{{ $option }}"
+                                       {{ in_array($option, old($field->label, [])) ? 'checked' : '' }}>
+                                {{ $option }}
+                            </label>
+                        @endforeach
+                    @endif
+
+                </div>
+
             @endforeach
-        @endif
 
-        <br><br>
+            <button type="submit" class="btn" style="width:100%;">
+                Submit
+            </button>
 
-    @endforeach
+        </form>
 
-    <button type="submit">Submit</button>
-</form>
+    </div>
 
+    <!-- Back -->
+    <div style="text-align:center; margin-top:20px;">
+        <a href="/admin/dashboard" class="btn-secondary">
+            ← Back to Dashboard
+        </a>
+    </div>
 
-    <div style="margin-bottom:15px;">
-    <a href="/admin/dashboard" style="background:#333;color:#fff;padding:6px 10px;text-decoration:none;">
-        ← Back to Dashboard
-    </a>
 </div>

@@ -1,28 +1,58 @@
-<h2>Valid Rows</h2>
+<link rel="stylesheet" href="{{ asset('css/style.css') }}">
 
-<table border="1">
-@foreach($validRows as $row)
-<tr>
-    <td>{{ $row[0] ?? '' }}</td>
-<td>{{ $row[1] ?? '' }}</td>
-</tr>
-@endforeach
-</table>
+<div class="container">
 
-<h2>Invalid Rows</h2>
+    <!-- VALID ROWS -->
+    <div class="card">
+        <h2 style="color:green;">✔ Valid Rows</h2>
 
-<table border="1">
-@foreach($invalidRows as $row)
-<tr>
-    <td>{{ $row[0] ?? '' }}</td>
-<td>{{ $row[1] ?? '' }}</td>
-</tr>
-@endforeach
-</table>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                </tr>
+            </thead>
 
+            <tbody>
+                @foreach($validRows as $row)
+                    <tr>
+                        <td>{{ $row[0] }}</td>
+                        <td>{{ $row[1] }}</td>
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
+    </div>
 
-    <div style="margin-bottom:15px;">
-    <a href="/admin/dashboard" style="background:#333;color:#fff;padding:6px 10px;text-decoration:none;">
-        ← Back to Dashboard
-    </a>
+    <!-- INVALID ROWS -->
+    <div class="card">
+        <h2 style="color:red;">❌ Invalid Rows</h2>
+
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @foreach($invalidRows as $row)
+                    <tr style="background:#ffe6e6;">
+                        <td>{{ $row[0] }}</td>
+                        <td>{{ $row[1] ?? '-' }}</td>
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Back -->
+    <div style="text-align:center; margin-top:20px;">
+        <a href="/admin/dashboard" class="btn-secondary">
+            ← Back to Dashboard
+        </a>
+    </div>
+
 </div>

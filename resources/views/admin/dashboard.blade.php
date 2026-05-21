@@ -1,27 +1,50 @@
-<x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            Admin Dashboard
-        </h2>
-    </x-slot>
+<link rel="stylesheet" href="{{ asset('css/style.css') }}">
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+<div class="container">
+    <div style="text-align:right; margin-bottom:15px;">
 
-            <div class="bg-white p-6 mb-4 shadow rounded">
-                <p>Total Forms: {{ $totalForms }}</p>
-                <p>Total Submissions: {{ $totalSubmissions }}</p>
-                <p>Total Users: {{ $totalUsers }}</p>
-            </div>
+    <form method="POST" action="{{ route('logout') }}">
+        @csrf
+        <button class="btn-danger">Logout</button>
+    </form>
 
-            <div class="bg-white p-6 shadow rounded">
-                <a href="/admin/forms">Manage Forms</a><br><br>
-                <a href="/admin/users">Manage Users</a><br><br>   
-                <a href="/admin/submissions">View Submissions</a><br><br> 
-                <a href="/admin/import">Import CSV</a><br><br>
-                <a href="/admin/export">Export CSV</a>
-            </div>
+</div>
 
+    <h2 style="margin-bottom:20px;">Admin Dashboard</h2>
+
+    <!-- STATS -->
+    <div class="dashboard-grid">
+
+        <div class="stat-card">
+            <h3>{{ $totalForms }}</h3>
+            <p>Total Forms</p>
         </div>
+
+        <div class="stat-card">
+            <h3>{{ $totalSubmissions }}</h3>
+            <p>Total Submissions</p>
+        </div>
+
+        <div class="stat-card">
+            <h3>{{ $totalUsers }}</h3>
+            <p>Total Users</p>
+        </div>
+
     </div>
-</x-app-layout>
+
+    <!-- ACTIONS -->
+    <div class="dashboard-grid" style="margin-top:30px;">
+
+        <a href="/admin/forms" class="action-card">📄 Manage Forms</a>
+
+        <a href="/admin/users" class="action-card">👤 Manage Users</a>
+
+        <a href="/admin/submissions" class="action-card">📊 View Submissions</a>
+
+        <a href="/admin/import" class="action-card">⬆ Import CSV</a>
+
+        <a href="/admin/export" class="action-card">⬇ Export CSV</a>
+
+    </div>
+
+</div>
